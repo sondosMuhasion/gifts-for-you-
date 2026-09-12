@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>هدية من القلب</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:"Segoe UI",Tahoma,sans-serif;overflow-x:hidden}
+body{
+  background:linear-gradient(135deg,#7d001c,#c9184a 48%,#ff4d6d);
+  color:#fff;min-height:100vh;
+}
+.scene{
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;position:relative;overflow:hidden;padding:30px 16px;
+}
+.intro{text-align:center;z-index:3;transition:.5s}
+.heart{
+  width:125px;height:125px;border:0;background:none;position:relative;
+  cursor:pointer;filter:drop-shadow(0 12px 20px #4b0010);
+  animation:pulse 1.25s infinite;display:inline-block;
+}
+.heart:before,.heart:after{
+  content:"";position:absolute;top:18px;width:70px;height:105px;
+  border-radius:70px 70px 0 0;background:#fff;
+}
+.heart:before{right:55px;transform:rotate(-45deg);transform-origin:0 100%}
+.heart:after{left:55px;transform:rotate(45deg);transform-origin:100% 100%}
+.heart span{
+  position:absolute;z-index:2;left:50%;top:48px;transform:translateX(-50%);
+  color:#c9184a;font-size:24px;font-weight:900;white-space:nowrap;
+}
+.hint{font-size:24px;font-weight:800;margin-top:18px;text-shadow:0 3px 10px #5b0015}
+.sub{font-size:14px;opacity:.9;margin-top:7px}
+
+.falling-hearts{position:fixed;inset:0;pointer-events:none;z-index:5;overflow:hidden}
+.fly-heart{
+  position:absolute;color:#ffe45e;font-size:24px;
+  animation:burst 2.2s cubic-bezier(.1,.7,.2,1) forwards, drift 5s linear 2.2s forwards;
+  text-shadow:0 2px 7px #7a1731;
+}
+@keyframes burst{
+  0%{transform:translate(-50%,-50%) scale(.2);opacity:0}
+  15%{opacity:1}
+  100%{transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) scale(1.2);opacity:1}
+}
+@keyframes drift{
+  to{transform:translateY(110vh) rotate(360deg);opacity:.2}
+}
+@keyframes pulse{50%{transform:scale(1.08)}}
+
+.gifts{
+  width:min(850px,94vw);margin:40px auto 0;display:grid;
+  grid-template-columns:repeat(3,1fr);gap:25px;z-index:4;max-height:70vh;overflow-y:auto;padding:10px;
+  opacity:0;transform:translateY(30px);pointer-events:none;
+}
+.gifts.show{opacity:1;transform:none;pointer-events:auto;transition:1s}
+.gift{
+  height:150px;border:0;border-radius:25px;background:linear-gradient(145deg,#ffccd5,#fff);
+  box-shadow:0 15px 30px rgba(74,0,18,.3);cursor:pointer;position:relative;
+  animation:pop .65s backwards;transition:.25s;
+}
+.gift:hover{transform:translateY(-7px) rotate(-2deg);box-shadow:0 22px 35px rgba(74,0,18,.4)}
+.gift:nth-child(1){animation-delay:.05s}.gift:nth-child(2){animation-delay:.15s}
+.gift:nth-child(3){animation-delay:.25s}.gift:nth-child(4){animation-delay:.35s}
+.gift:nth-child(5){animation-delay:.45s}.gift:nth-child(6){animation-delay:.55s}
+@keyframes pop{from{opacity:0;transform:scale(.2) rotate(20deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+.box{font-size:70px;filter:drop-shadow(0 7px 5px #b21e4b)}
+.gift-label{display:block;color:#9e1237;font-weight:900;margin-top:-5px}
+
+.overlay{
+  position:fixed;inset:0;background:rgba(61,0,17,.65);backdrop-filter:blur(5px);
+  display:flex;align-items:center;justify-content:center;z-index:20;
+  opacity:0;pointer-events:none;transition:.3s;padding:20px;
+}
+.overlay.open{opacity:1;pointer-events:auto}
+.message{
+  width:min(600px,94vw);min-height:300px;background:#fff;border-radius:28px;
+  color:#b5123c;position:relative;padding:70px 35px 35px;
+  box-shadow:0 30px 70px rgba(0,0,0,.35);display:flex;align-items:center;
+  justify-content:center;text-align:center;
+}
+.close{
+  position:absolute;top:14px;right:18px;width:44px;height:44px;border:0;
+  border-radius:50%;background:#ffe0e7;color:#a20d34;font-size:28px;
+  font-weight:900;cursor:pointer;
+}
+.message h2{font-size:48px;margin:0;font-family:Georgia,serif;color:#c9184a}
+.message p{font-size:18px;color:#8b2942;margin-top:12px}
+@media(max-width:650px){
+ .gifts{grid-template-columns:repeat(2,1fr);gap:15px}
+ .gift{height:135px}.box{font-size:58px}
+ .message h2{font-size:36px}
+}
+</style>
+</head>
+<body>
+<section class="scene">
+  <div class="intro" id="intro">
+    <button class="heart" id="heartBtn" aria-label="اضغط على القلب"><span>♥</span></button>
+    <div class="hint">اضغط على القلب</div>
+    <div class="sub">هناك مفاجأة صغيرة بانتظارك</div>
+  </div>
+  <div class="gifts" id="gifts"></div>
+</section>
+
+<div class="falling-hearts" id="hearts"></div>
+
+<div class="overlay" id="overlay">
+  <div class="message">
+    <button class="close" id="closeBtn" aria-label="إغلاق">×</button>
+    <div>
+      <h2>i love you</h2>
+      <p>♥ رسالة صغيرة من القلب ♥</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const heartBtn=document.getElementById("heartBtn");
+const hearts=document.getElementById("hearts");
+const gifts=document.getElementById("gifts");
+const intro=document.getElementById("intro");
+const overlay=document.getElementById("overlay");
+const closeBtn=document.getElementById("closeBtn");
+
+function createHearts(){
+  const total=420;
+  for(let i=0;i<total;i++){
+    const h=document.createElement("span");
+    h.className="fly-heart";
+    h.textContent="♥";
+    const startX=50+(Math.random()-0.5)*8;
+    const startY=50+(Math.random()-0.5)*8;
+    h.style.left=startX+"%";h.style.top=startY+"%";
+    h.style.fontSize=(14+Math.random()*28)+"px";
+    h.style.setProperty("--x",((Math.random()-0.5)*1350)+"px");
+    h.style.setProperty("--y",((Math.random()-0.5)*850)+"px");
+        h.style.animationDelay=(Math.random()*0.55)+"s,"+(2.2+Math.random()*1.4)+"s";
+    hearts.appendChild(h);
+    setTimeout(()=>h.remove(),9000);
+  }
+}
+
+function shuffle(a){
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+heartBtn.addEventListener("click",()=>{
+  heartBtn.disabled=true;
+  createHearts();
+  intro.style.transform="scale(.7)";
+  intro.style.opacity="0";
+  setTimeout(()=>{
+    intro.style.display="none";
+    const messages = [
+      "وجودك يجعل كل شيء أجمل.",
+      "أنت أجمل صدفة في حياتي.",
+      "ابتسامتك وحدها تصنع يومًا رائعًا.",
+      "معك تصبح اللحظات العادية مميزة.",
+      "أنت دائمًا في مكان خاص بقلبي.",
+      "كل لحظة جميلة أتمنى أن أشاركك بها.",
+      "أحب التفاصيل الصغيرة التي تذكّرني بك.",
+      "وجودك يضيف للحياة معنى أجمل.",
+      "أنت سبب للكثير من اللحظات الجميلة.",
+      "أتمنى أن تبقى أيامك مليئة بالفرح.",
+      "هناك أشخاص لا يُنسَون، وأنت منهم.",
+      "كل ذكرى جميلة تصبح أجمل عندما تكون فيها.",
+      "أنت تستحق كل الأشياء الجميلة في العالم.",
+      "قربك يجعل الوقت يمر بطريقة مختلفة.",
+      "أتمنى أن تجد في كل يوم سببًا للابتسام.",
+      "بعض الأشخاص هدية، وأنت واحدة من أجمل الهدايا.",
+      "مهما كانت الأيام، أتمنى أن تبقى سعيدًا.",
+      "هذه الهدية مجرد طريقة صغيرة لأقول: أنت مميز."
+    ];
+    const order=shuffle([...Array(messages.length).keys()]);
+    gifts.innerHTML=order.map((n,i)=>`
+      <button class="gift" style="animation-delay:${i*.12}s" data-message="${messages[n]}">
+        <span class="box">🎁</span><span class="gift-label">هدية ${i+1}</span>
+      </button>`).join("");
+    gifts.classList.add("show");
+  },2500);
+});
+
+gifts.addEventListener("click",(e)=>{
+  const gift=e.target.closest(".gift");
+  if(!gift)return;
+  overlay.querySelector("h2").textContent = gift.dataset.message;
+  overlay.querySelector("p").textContent = "♥ رسالة خاصة لك ♥";
+  overlay.classList.add("open");
+});
+
+closeBtn.addEventListener("click",()=>overlay.classList.remove("open"));
+overlay.addEventListener("click",(e)=>{
+  if(e.target===overlay)overlay.classList.remove("open");
+});
+document.addEventListener("keydown",(e)=>{
+  if(e.key==="Escape")overlay.classList.remove("open");
+});
+</script>
+</body>
+</html>
